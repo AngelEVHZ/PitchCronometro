@@ -89,15 +89,17 @@
     #delta-badge.negative { background: rgba(48,209,88,0.12);  color: #30d158; }
     #delta-badge.visible  { opacity: 1; }
 
-    /* ── PITCH TEXT ── */
+    /* ── PITCH TEXT styles ── */
     #pitch-box {
-      width: 580px;
-      max-width: 92vw;
       background: #161616;
       border: 1px solid #2e2e2e;
       border-radius: 14px;
       padding: 22px 26px;
-      position: relative;
+      flex: 1;
+      min-width: 280px;
+      max-width: 480px;
+      position: sticky;
+      top: 28px;
     }
 
     #pitch-label {
@@ -185,7 +187,7 @@
     #finished-table td.over  { color: #ff3b30; }
     #finished-table td.under { color: #30d158; }
 
-    #restart-btn {
+    #restart-btn, #tap-btn {
       background: #0a84ff;
       border: none;
       color: #fff;
@@ -196,7 +198,20 @@
       cursor: pointer;
       margin-top: 8px;
     }
-    #restart-btn:hover { background: #0070d8; }
+    #restart-btn:hover, #tap-btn:hover { background: #0070d8; }
+
+    #tap-btn {
+      display: none;
+      width: 100%;
+      max-width: 360px;
+      font-size: 17px;
+      padding: 15px 30px;
+    }
+
+    @media (pointer: coarse) {
+      #tap-btn { display: block; }
+      #hint { display: none; }
+    }
 
     #main-view {
       display: flex;
@@ -205,30 +220,55 @@
       gap: 18px;
       width: 100%;
     }
+
+    #left-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      width: 100%;
+    }
+
+    @media (min-width: 860px) {
+      #main-view {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 40px;
+        max-width: 1100px;
+      }
+
+      #left-col {
+        width: auto;
+        flex-shrink: 0;
+      }
+    }
   </style>
 </head>
 <body>
 
 <div id="main-view">
-  <div id="top-block">
-    <div id="slide-number">SLIDE 1 / 10</div>
-    <div id="slide-title">—</div>
-    <div id="slide-duration">0 seg · 0:00 → 0:00</div>
-    <div id="timer-display">0:00</div>
-    <div id="progress-wrap"><div id="progress-bar"></div></div>
-    <div id="delta-badge">+0s</div>
+  <div id="left-col">
+    <div id="top-block">
+      <div id="slide-number">SLIDE 1 / 10</div>
+      <div id="slide-title">—</div>
+      <div id="slide-duration">0 seg · 0:00 → 0:00</div>
+      <div id="timer-display">0:00</div>
+      <div id="progress-wrap"><div id="progress-bar"></div></div>
+      <div id="delta-badge">+0s</div>
+    </div>
+    <div id="score-strip"></div>
+    <div id="total-row">Total: <span id="total-val">0s</span></div>
+    <div id="hint">ESPACIO o ENTER → iniciar</div>
+    <button id="tap-btn">Iniciar / Siguiente →</button>
   </div>
 
-  <!-- Pitch text box -->
+  <!-- Pitch text box — derecha en desktop, abajo en móvil -->
   <div id="pitch-box">
     <div id="pitch-label">Texto del slide</div>
     <div id="pitch-text"></div>
     <div id="pitch-hint"></div>
   </div>
-
-  <div id="score-strip"></div>
-  <div id="total-row">Total: <span id="total-val">0s</span></div>
-  <div id="hint">ESPACIO o ENTER → iniciar</div>
 </div>
 
 <div id="finished">
@@ -249,62 +289,62 @@
   const SLIDES = [
     {
       title: "Portada",
-      start: 0, end: 14,
-      text: "Somos FlowPass — el sistema operativo para cualquier negocio basado en membresías y servicios recurrentes: deportes, arte, música, idiomas, salud y más. Un solo sistema. Sin hojas de cálculo. Control total.",
+      start: 0, end: 12,
+      text: "Somos FlowPass — el sistema operativo para negocios de membresías y servicios recurrentes: deportes, arte, música, idiomas, salud. Un solo sistema. Control total.",
       hint: "De pie, mirando al jurado. Cierra con el tagline del slide."
     },
     {
       title: "El problema — $6.3B",
-      start: 14, end: 39,
-      text: "Son más de 500,000 negocios solo en Latinoamérica — y juntos pierden $6.3 mil millones de dólares al año. Cada negocio pierde hasta $12,700 USD anuales — el 20% de sus ingresos — por pagos perdidos, operaciones ineficientes y miembros que se van sin renovar.",
+      start: 12, end: 32,
+      text: "Más de 500,000 negocios en Latinoamérica pierden juntos $6.3 mil millones de dólares al año. Cada uno pierde hasta $12,700 USD anuales — el 20% de sus ingresos — por pagos perdidos, ineficiencias y miembros que no renuevan.",
       hint: "Pausa después de \"$6.3 mil millones\" — deja que aterrice."
     },
     {
       title: "¿Por qué sigue pasando?",
-      start: 39, end: 61,
-      text: "¿Por qué sigue pasando? Porque el dueño lo hace todo — atiende, administra y cobra. Pasan horas en WhatsApp recordando pagos, en Excel registrando asistencia, contactando uno por uno a los miembros que no renovaron. Eso no es gestión — es apagar incendios todos los días.",
-      hint: "\"Apagar incendios\" conecta con el cierre del slide 8."
+      start: 32, end: 50,
+      text: "¿Por qué sigue pasando? Porque el dueño lo hace todo. Horas en WhatsApp cobrando, Excel registrando asistencia, persiguiendo a cada miembro que no renovó. Eso no es gestión — es apagar incendios.",
+      hint: "\"Apagar incendios\" conecta con el slide 4."
     },
     {
       title: "Solución — FlowPass + Flowy",
-      start: 61, end: 97,
-      text: "No somos solo otro software de gestión. Estamos construyendo el primer sistema operativo autónomo para estos negocios en Latinoamérica.\n\nImagina esto: El agente de FlowPass detecta que 12 miembros no han renovado, les escribe por WhatsApp, procesa el pago y actualiza su estado — solo, sin que nadie lo active.\n\nEl miembro llega a la puerta, muestra su QR, y el sistema ya sabe si puede entrar.\n\nEl dueño nunca tuvo que hacer nada. Solo hacer lo que le apasiona.\n\nEso es FlowPass IA-first: agentes que operan el negocio por ti.",
+      start: 50, end: 82,
+      text: "No somos otro software de gestión. Estamos construyendo el primer sistema operativo autónomo para estos negocios en Latinoamérica.\n\nImagina esto:\n\nEl agente de FlowPass detecta que 12 miembros no renovaron, les escribe por WhatsApp, procesa el pago y actualiza su estado — solo.\n\nEl miembro llega, muestra su QR, y el sistema ya sabe si puede entrar.\n\nEl dueño no hizo nada. Solo lo que le apasiona.\n\nEso es FlowPass IA-first: agentes que operan el negocio por ti.",
       hint: "Pausa después de \"por ti\" — es la frase ancla del pitch."
     },
     {
       title: "Producto en acción",
-      start: 97, end: 114,
-      text: "Y ya estamos viendo los resultados. 20% menos tiempo en operaciones. 10 a 15% menos pagos atrasados. Los dueños tienen visibilidad total de su negocio en tiempo real — sin hojas de cálculo, sin perseguir a nadie.",
+      start: 82, end: 96,
+      text: "Y ya estamos viendo los resultados. 20% menos tiempo en operaciones. Hasta 15% menos pagos atrasados. Visibilidad total del negocio en tiempo real.",
       hint: "El slide muestra el producto — tú solo dices los números."
     },
     {
       title: "Mercado — $8M → $312M",
-      start: 114, end: 136,
-      text: "El mercado accesible para nosotros hoy son 13,000 negocios — el 4% del total — lo que representa $8M en ARR. Y más allá de ese punto de entrada, el mercado total en LatAm vale $312M. Empezamos enfocados y escalamos.",
-      hint: "Actualizado a $312M para alinearlo con el deck v2."
+      start: 96, end: 114,
+      text: "Nuestro mercado accesible hoy son 13,000 negocios — 4% del total — $8M en ARR. El mercado total en LatAm vale $312M. Empezamos enfocados y escalamos.",
+      hint: "Alineado con el deck v2."
     },
     {
       title: "Tracción — métricas reales",
-      start: 136, end: 162,
-      text: "Y ya estamos capturando ese mercado. 24 clientes pagantes, $1,245 de MRR, CAC de $32 y churn de 0.6% — solo un cliente perdido en 7 meses. En los últimos 3 meses sumamos 14 nuevos clientes. Y lo más revelador: 3 clientes abandonaron un competidor para venir a FlowPass, y 8 nos eligieron después de comparar el mercado. Eso no es suerte — es producto-mercado.",
-      hint: "Al llegar al 2:42 debes estar cerrando este slide."
+      start: 114, end: 136,
+      text: "24 clientes pagantes, $1,245 de MRR, CAC de $32, churn de 0.6% — un solo cliente perdido en 7 meses. En los últimos 3 meses sumamos 14 nuevos. Y lo clave: 3 dejaron a un competidor por nosotros, 8 nos eligieron tras comparar. Eso es producto-mercado.",
+      hint: "Al llegar al 2:16 cierras este slide."
     },
     {
       title: "Visión · Hitos · Use of Funds",
-      start: 162, end: 182,
-      text: "Justo ahora estamos abriendo México. Para este año: Flowy con clientes reales y 60 negocios activos. El año que viene, somos el sistema operativo autónomo de referencia en LatAm.\n\nLos fondos van a dos frentes: desarrollo de los agentes de IA y aceleración de la entrada a México. Cada sol directo a producto y mercado.",
-      hint: "Slide rápido — los hitos los muestra el deck, tú solo los dices comprimidos."
+      start: 136, end: 152,
+      text: "Hoy abrimos México. Este año: Flowy con clientes reales y 60 negocios activos. El próximo: el sistema operativo autónomo de referencia en LatAm.\n\nLos fondos van a dos frentes: agentes de IA y entrada a México.",
+      hint: "Slide rápido — los hitos los muestra el deck."
     },
     {
       title: "Equipo — ¿Por qué nosotros?",
-      start: 182, end: 205,
-      text: "Vimos que el mercado estaba desatendido — software caro, complejo, sin IA y sin atención real al cliente. Decidimos construirlo diferente: simple, accesible y autónomo. En 7 meses, 24 negocios pagantes nos eligieron sobre la competencia. Grecia, Ángel y Piero — ventas, tecnología y operaciones — el tridente que necesita esta startup.",
-      hint: "La tracción responde el \"por qué nosotros\" mejor que cualquier credencial."
+      start: 152, end: 170,
+      text: "Vimos un mercado desatendido — software caro, sin IA, sin servicio. Lo construimos diferente: simple, accesible, autónomo. En 7 meses, 24 negocios nos eligieron sobre la competencia. Grecia, Ángel y Piero — ventas, tecnología y operaciones.",
+      hint: "La tracción responde \"por qué nosotros\" mejor que cualquier credencial."
     },
     {
-      title: "Cierre + CTA + logos",
-      start: 205, end: 219,
-      text: "Tenemos el producto, la tracción y el equipo. Si quieren ver FlowPass en acción o explorar cómo crecer juntos, agendemos una segunda conversación. Gracias — somos FlowPass.",
+      title: "Cierre + CTA",
+      start: 170, end: 180,
+      text: "Tenemos producto, tracción y equipo. Agendemos una segunda conversación. Gracias — somos FlowPass.",
       hint: "Termina siempre con el nombre. Los logos hacen el trabajo visual."
     },
   ];
@@ -324,6 +364,7 @@
   const elStrip    = document.getElementById('score-strip');
   const elTotal    = document.getElementById('total-val');
   const elHint     = document.getElementById('hint');
+  const elTapBtn   = document.getElementById('tap-btn');
   const elPitchText = document.getElementById('pitch-text');
   const elPitchHint = document.getElementById('pitch-hint');
   const elMain     = document.getElementById('main-view');
@@ -338,7 +379,12 @@
 
   function fmtDelta(d) {
     const s = Math.round(d);
-    return (s >= 0 ? '+' : '') + s + 's';
+    const sign = s >= 0 ? '+' : '-';
+    const abs = Math.abs(s);
+    if (abs < 60) return sign + abs + 's';
+    const m = Math.floor(abs / 60);
+    const ss = String(abs % 60).padStart(2, '0');
+    return sign + m + ':' + ss + ' min';
   }
 
   function loadSlide(idx) {
@@ -408,6 +454,7 @@
     updateStrip();
     raf = requestAnimationFrame(tick);
     elHint.textContent = 'ENTER → siguiente slide';
+    elTapBtn.textContent = 'Siguiente →';
   }
 
   function advance() {
@@ -458,7 +505,7 @@
 
     const t = Math.round(total);
     document.getElementById('total-row-final').innerHTML =
-      `Total acumulado: <strong style="color:${t > 0 ? '#ff3b30' : '#30d158'}">${fmtDelta(t)}</strong> vs objetivo 3:39`;
+      `Total acumulado: <strong style="color:${t > 0 ? '#ff3b30' : '#30d158'}">${fmtDelta(t)}</strong> vs objetivo 2:50`;
   }
 
   function reset() {
@@ -471,6 +518,7 @@
     loadSlide(0);
     updateStrip();
     elHint.textContent  = 'ESPACIO o ENTER → iniciar';
+    elTapBtn.textContent = 'Iniciar / Siguiente →';
     elTotal.textContent = '0s';
     elTotal.className   = '';
     elDelta.className   = '';
@@ -482,6 +530,14 @@
       advance();
     }
   });
+
+  document.getElementById('tap-btn').addEventListener('click', advance);
+
+  document.getElementById('main-view').addEventListener('touchend', (e) => {
+    if (e.target.closest('#restart-btn') || e.target.closest('#tap-btn')) return;
+    e.preventDefault();
+    advance();
+  }, { passive: false });
 
   document.getElementById('restart-btn').addEventListener('click', reset);
 
