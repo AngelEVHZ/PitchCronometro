@@ -354,6 +354,7 @@
   let slideStartTime = 0;
   let slideDeltas = [];
   let raf = null;
+  let pitchStartTime = 0;
 
   const elTimer    = document.getElementById('timer-display');
   const elTitle    = document.getElementById('slide-title');
@@ -395,7 +396,6 @@
     elDuration.textContent = `${dur} seg  ·  ${fmt(sl.start)} → ${fmt(sl.end)}`;
     elPitchText.textContent = sl.text;
     elPitchHint.textContent = sl.hint ? `💡 ${sl.hint}` : '';
-    elTimer.textContent    = '0:00';
     elTimer.className      = '';
     elBar.style.width      = '0%';
     elBar.className        = '';
@@ -433,7 +433,7 @@
     const elapsed = (performance.now() - slideStartTime) / 1000;
     const isOver  = elapsed > dur;
 
-    elTimer.textContent = fmt(elapsed);
+    elTimer.textContent = fmt((performance.now() - pitchStartTime) / 1000);
     elTimer.className   = isOver ? 'over' : '';
 
     const pct = Math.min((elapsed / dur) * 100, 100);
@@ -448,7 +448,9 @@
   }
 
   function startSlide() {
+    cancelAnimationFrame(raf);
     slideStartTime = performance.now();
+    if (currentSlide === 0) pitchStartTime = slideStartTime;
     running = true;
     loadSlide(currentSlide);
     updateStrip();
@@ -513,6 +515,8 @@
     currentSlide = 0;
     running      = false;
     slideDeltas  = [];
+    pitchStartTime = 0;
+    elTimer.textContent = '0:00';
     elMain.style.display     = 'flex';
     elFinished.style.display = 'none';
     loadSlide(0);
